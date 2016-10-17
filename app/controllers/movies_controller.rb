@@ -10,17 +10,54 @@ class MoviesController < ApplicationController
     # will render app/views/movies/show.<extension> by default
   end
 
-  def index
-    #@movies = Movie.all
-    #######   PART1
-    if params[:sort_order].nil?
-      @movies = Movie.all
-    elsif 'by_title' == params[:sort_order]
+    def index
+  #  @movies = Movie.all
+  @all_ratings = Movie.putratings
+    
+     if params[:commit] == 'Refresh'
+       
+      params[:sort_order] = nil
+      session[:sort_order] = nil
+      
+      if params[:ratings]
+        @ratings_filter = params[:ratings].keys
+      else
+        @ratings_filter=@all_ratings
+      end
+    else
+       if session[:ratings]
+          @ratings_filter=session[:ratings]
+        else
+          @ratings_filter = @all_ratings
+        end
+     
+    end
+      
+      if @ratings_filter!=session[:ratings]
+      session[:ratings] = @ratings_filter
+      end
+      
+      if  params[:sort_order]!= nil && params[:sort_order] != session[:sort_order]
+        session[:sort_order] = params[:sort_order]
+      end
+      
+      if params[:sort_order] == nil && session[:sort_order]!=nil
+         params[:sort_order] = session[:sort_order]
+      end
+        #######   PART1
+  
+    if 'by_title' == params[:sort_order] || 'by_title' == session[:sort_order]
        @movies = Movie.order(:title)
-    elsif 'by_release_date' == params[:sort_order]
+       #session[:sort_order] = 'by_title'
+    elsif 'by_release_date' == params[:sort_order] || 'by_release_date' == session[:sort_order]
       @movies = Movie.order(:release_date)
+    elsif params[:sort_order].nil?
+      @movies = Movie.all
+      #session[:sort_order] = 'by_release_date'
     end
     #######
+      
+      @movies = @movies.ratingfilter(@ratings_filter)
   end
 
   def new
