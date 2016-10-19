@@ -11,11 +11,11 @@ class MoviesController < ApplicationController
   end
 
     def index
-  #  @movies = Movie.all
-  @all_ratings = Movie.putratings
+ ############################ PART 2 and PART3    
+  @all_ratings = Movie.put_ratings
     
      if params[:commit] == 'Refresh'
-       
+    
       params[:sort_order] = nil
       session[:sort_order] = nil
       
@@ -44,19 +44,17 @@ class MoviesController < ApplicationController
       if params[:sort_order] == nil && session[:sort_order]!=nil
          params[:sort_order] = session[:sort_order]
       end
+   ###################################    
+      
         #######   PART1
-  
     if 'by_title' == params[:sort_order] || 'by_title' == session[:sort_order]
        @movies = Movie.order(:title)
-       #session[:sort_order] = 'by_title'
     elsif 'by_release_date' == params[:sort_order] || 'by_release_date' == session[:sort_order]
       @movies = Movie.order(:release_date)
     elsif params[:sort_order].nil?
       @movies = Movie.all
-      #session[:sort_order] = 'by_release_date'
     end
-    #######
-      
+        #######
       @movies = @movies.ratingfilter(@ratings_filter)
   end
 
